@@ -21,9 +21,9 @@ const Dashboard = () => {
         name: session?.user?.name || '',
         username: session?.user?.name?.replace(/\s+/g, '').toLowerCase() || '',
         email: session?.user?.email || '',
-        topSkill: 'Digital Marketer',
+        topSkill: '',
         profilePicture: session?.user?.image || '',
-        coverPicture: "https://img.freepik.com/free-psd/digital-marketing-agency-corporate-facebook-cover-template_106176-2262.jpg?t=st=1772826219~exp=1772829819~hmac=db9290a9843685880887a47b7027f37a4a02c4c9692052348cac8ad3f6fdcd67&w=1480"
+        coverPicture: "/cover-placeholder.png"
     })
 
     // Fetch user data when the component mounts
@@ -35,9 +35,9 @@ const Dashboard = () => {
                     name: data?.name || '',
                     username: data?.username || '',
                     email: data?.email || '',
-                    topSkill: data?.topSkill || 'Digital Marketer',
+                    topSkill: data?.topSkill || '',
                     profilePicture: data?.profilePicture || '',
-                    coverPicture: data?.coverPicture || "https://img.freepik.com/free-psd/digital-marketing-agency-corporate-facebook-cover-template_106176-2262.jpg?t=st=1772826219~exp=1772829819~hmac=db9290a9843685880887a47b7027f37a4a02c4c9692052348cac8ad3f6fdcd67&w=1480"
+                    coverPicture: data?.coverPicture || "/cover-placeholder.png"
                 })
             })
         }
@@ -51,11 +51,11 @@ const Dashboard = () => {
                     // User not found, initialize with session data and save to database
                     const initialData = {
                         name: session?.user?.name || '',
-                        username: session?.user?.name?.replace(/\s+/g, '').toLowerCase() || '',
+                        username: session?.user?.name?.replace(/\s+/g, '')?.toLowerCase() || '',
                         email: session?.user?.email || '',
-                        topSkill: 'Digital Marketer',
+                        topSkill: '',
                         profilePicture: session?.user?.image || '',
-                        coverPicture: "https://img.freepik.com/free-psd/digital-marketing-agency-corporate-facebook-cover-template_106176-2262.jpg?t=st=1772826219~exp=1772829819~hmac=db9290a9843685880887a47b7027f37a4a02c4c9692052348cac8ad3f6fdcd67&w=1480"
+                        coverPicture: "/cover-placeholder.png"
                     }
                     const savedUser = await saveUser(initialData)
                     setUserData(savedUser)
@@ -66,9 +66,9 @@ const Dashboard = () => {
                         name: data?.name || '',
                         username: data?.username || '',
                         email: data?.email || '',
-                        topSkill: data?.topSkill || 'Digital Marketer',
+                        topSkill: data?.topSkill || '',
                         profilePicture: data?.profilePicture || '',
-                        coverPicture: data?.coverPicture || "https://img.freepik.com/free-psd/digital-marketing-agency-corporate-facebook-cover-template_106176-2262.jpg?t=st=1772826219~exp=1772829819~hmac=db9290a9843685880887a47b7027f37a4a02c4c9692052348cac8ad3f6fdcd67&w=1480"
+                        coverPicture: data?.coverPicture || "/cover-placeholder.png"
                     })
 
                 }
@@ -101,9 +101,9 @@ const Dashboard = () => {
                 name: updatedUser?.name || '',
                 username: updatedUser?.username || '',
                 email: updatedUser?.email || '',
-                topSkill: updatedUser?.topSkill || 'Digital Marketer',
+                topSkill: updatedUser?.topSkill || '',
                 profilePicture: updatedUser?.profilePicture || '',
-                coverPicture: updatedUser?.coverPicture || "https://img.freepik.com/free-psd/digital-marketing-agency-corporate-facebook-cover-template_106176-2262.jpg?t=st=1772826219~exp=1772829819~hmac=db9290a9843685880887a47b7027f37a4a02c4c9692052348cac8ad3f6fdcd67&w=1480"
+                coverPicture: updatedUser?.coverPicture || "/cover-placeholder.png"
             })
             toast.success('Information updated successfully!', {
                 position: "top-right",
@@ -218,7 +218,8 @@ const Dashboard = () => {
                         <label className='text-sm font-semibold text-gray-300' htmlFor="username">Username</label>
                         <div className='relative'>
                             <span className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none'>@</span>
-                            <input className={`${inputCls} pl-7`} type="text" id="username" name="username" value={formData.username} onChange={(e) => { setFormData({ ...formData, username: e.target.value }); setError('') }} />
+                            {/* Space is not allowed */}
+                            <input className={`${inputCls} pl-7`} type="text" id="username" name="username" value={formData.username} onChange={(e) => { setFormData({ ...formData, username: e.target.value.replace(/\s/g, "").toLowerCase() }); setError('') }} />
                         </div>
                         {error && (
                             <p className='fm-error flex items-center gap-1.5 text-red-400 text-sm bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2'>
@@ -238,7 +239,7 @@ const Dashboard = () => {
 
                     <div className='fm-field flex flex-col gap-1.5' style={{ animationDelay: '0.36s' }}>
                         <label className='text-sm font-semibold text-gray-300' htmlFor="topSkill">Top Skill</label>
-                        <input className={inputCls} type="text" id="topSkill" name="topSkill" value={formData.topSkill} onChange={(e) => setFormData({ ...formData, topSkill: e.target.value })} />
+                        <input required className={inputCls} type="text" id="topSkill" name="topSkill" value={formData.topSkill} onChange={(e) => setFormData({ ...formData, topSkill: e.target.value })} />
                     </div>
 
                     <div className='fm-field flex flex-col gap-1.5' style={{ animationDelay: '0.43s' }}>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaSpinner, FaCreditCard, FaPaypal } from "react-icons/fa";
+import { FaSpinner, FaCreditCard } from "react-icons/fa";
 
 const PaymentForm = ({ onSuccess, onCancel, amount }) => {
     const [formData, setFormData] = useState({
@@ -138,35 +138,11 @@ const PaymentForm = ({ onSuccess, onCancel, amount }) => {
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
-                        <div className="flex sm:flex-row flex-col space-x-4 mb-6">
-                            <label className="flex items-center space-x-2">
-                                <input
-                                    type="radio"
-                                    name="paymentMethod"
-                                    value="credit-card"
-                                    checked={formData.paymentMethod === "credit-card"}
-                                    onChange={handleInputChange}
-                                    className="form-radio h-4 w-4 text-indigo-600"
-                                />
-                                <span className="flex items-center">
-                                    <FaCreditCard className="mr-2" />
-                                    Credit Card
-                                </span>
-                            </label>
-                            <label className="flex items-center space-x-2">
-                                <input
-                                    type="radio"
-                                    name="paymentMethod"
-                                    value="paypal"
-                                    checked={formData.paymentMethod === "paypal"}
-                                    onChange={handleInputChange}
-                                    className="form-radio h-4 w-4 text-indigo-600"
-                                />
-                                <span className="flex items-center">
-                                    <FaPaypal className="mr-2" />
-                                    PayPal
-                                </span>
-                            </label>
+                        <div className="flex items-center mb-6">
+                            <span className="flex items-center text-white">
+                                <FaCreditCard className="mr-2" />
+                                Credit Card
+                            </span>
                         </div>
 
                         {formData.paymentMethod === "credit-card" && (
