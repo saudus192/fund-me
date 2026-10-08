@@ -66,7 +66,7 @@ const Navbar = () => {
 
     const handleSearch = (e) => {
         e.preventDefault()
-        const username = e.target[0].value.trim()
+        const username = e.target[0].value.trim()?.replace(/\s+/g, '').toLowerCase()
         // Perform search logic here
         if (username) {
             router.push(`/${username}`)
