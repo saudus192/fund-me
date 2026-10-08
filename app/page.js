@@ -123,7 +123,7 @@ export default function Home() {
             <Reveal className="w-[90%] flex justify-center">
               <div className="fm-video rounded-2xl p-0.75 bg-linear-to-br from-green-400/70 to-blue-600/70 shadow-lg shadow-black/40">
                 <video
-                  className="block sm:w-140 sm:h-79 w-65 h-36 rounded-2xl bg-black object-cover"
+                  className="block sm:w-140 sm:h-79 w-80 h-45 rounded-2xl bg-black object-cover"
                   src="/fund-me-intro.mp4"
                   poster="/fund-me-intro-poster.png"
                   controls
