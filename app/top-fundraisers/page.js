@@ -7,16 +7,25 @@ import Loader from '@/components/loader'
 
 const TopFundraisers = () => {
     const [users, setUsers] = React.useState([])
-    const [isHydrated, setIsHydrated] = React.useState(false)
+    const [isLoading, setIsLoading] = React.useState(true)
     const router = useRouter()
 
     React.useEffect(() => {
-        setIsHydrated(true)
+        let ignore = false
+
         const fetchUsers = async () => {
-            const users = await getAllUsers()
-            setUsers(users)
+            try {
+                const data = await getAllUsers()
+                if (!ignore) setUsers(data || [])
+            } catch (error) {
+                console.error('Failed to fetch fundraisers:', error)
+            } finally {
+                if (!ignore) setIsLoading(false)
+            }
         }
+
         fetchUsers()
+        return () => { ignore = true }
     }, [])
 
     return (
@@ -64,14 +73,14 @@ const TopFundraisers = () => {
                 <p className='fm-sub text-gray-400 text-center'>Discover the most successful fundraisers and their impact.</p>
                 <div className='fm-line mx-auto mt-4 mb-10 h-1 w-24 rounded-full bg-linear-to-r from-green-400 to-blue-600'></div>
 
-                {/* Loader for loading state */}
-                {!isHydrated || users.length === 0 ? (
-                    isHydrated && users.length === 0 ? (
-                        <p className='text-gray-400 text-center'>No fundraisers found.</p>
-                    ) : (
-                        <Loader text="Loading top fundraisers..." />
-                    )
+                {isLoading ? (
+                    // 1) Still fetching from the database
+                    <Loader text="Loading top fundraisers..." />
+                ) : users.length === 0 ? (
+                    // 2) Fetch finished, nothing returned
+                    <p className='text-gray-400 text-center'>No fundraisers found.</p>
                 ) : (
+                    // 3) Fetch finished, fundraisers available
                     <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
                         {/* Fundraiser cards */}
                         {users.map((user, index) => (
@@ -101,7 +110,8 @@ const TopFundraisers = () => {
                                 </button>
                             </div>
                         ))}
-                    </div>)}
+                    </div>
+                )}
             </div>
         </>
     )
