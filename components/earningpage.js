@@ -13,22 +13,60 @@ const rankStyles = [
 ]
 
 const EarningPage = ({ username }) => {
-    const [payments, setPayments] = React.useState(null)
+    const [payments, setPayments] = React.useState([])
+    const [isLoading, setIsLoading] = React.useState(true)
+    const [hasError, setHasError] = React.useState(false)
 
     React.useEffect(() => {
+        // No username -> nothing to fetch
+        if (!username) {
+            setPayments([])
+            setHasError(false)
+            setIsLoading(false)
+            return
+        }
+
+        let ignore = false
 
         const fetchPayments = async () => {
-            const paymentsData = await getPaymentsReceived(username)
-            setPayments(paymentsData)
+            setIsLoading(true)
+            setHasError(false)
+            try {
+                const data = await getPaymentsReceived(username)
+                if (!ignore) {
+                    const safeData = Array.isArray(data)
+                        ? data.map((p) => ({ ...p, amount: Number(p.amount) || 0 }))
+                        : []
+                    setPayments(safeData)
+                }
+            } catch (error) {
+                console.error('Failed to fetch payments:', error)
+                if (!ignore) {
+                    setPayments([])
+                    setHasError(true)
+                }
+            } finally {
+                if (!ignore) setIsLoading(false)
+            }
         }
 
         fetchPayments()
+        return () => { ignore = true }
     }, [username])
 
     // Derived values (read-only, no state changes)
-    const totalEarnings = payments ? payments.reduce((sum, payment) => sum + payment.amount, 0) : 0
-    const highestDonation = payments && payments.length > 0 ? Math.max(...payments.map((p) => p.amount)) : 0
-    const topSupporters = payments ? [...payments].sort((a, b) => b.amount - a.amount).slice(0, 5) : []
+    const totalEarnings = payments.reduce((sum, payment) => sum + payment.amount, 0)
+    const highestDonation = payments.reduce((max, payment) => Math.max(max, payment.amount), 0)
+    const topSupporters = [...payments].sort((a, b) => b.amount - a.amount).slice(0, 5)
+
+    // Username could not be resolved (e.g. user not found in database)
+    if (!username) {
+        return (
+            <div className='container mx-auto p-5 lg:w-[45%] md:w-[60%] sm:w-[75%] w-[90%] my-8'>
+                <p className='text-gray-300 text-center'>We couldn&apos;t find your profile, so there are no earnings to show.</p>
+            </div>
+        )
+    }
 
     return (
         <>
@@ -65,22 +103,22 @@ const EarningPage = ({ username }) => {
                 <div className='fm-card bg-gray-800 p-5 rounded-xl border border-gray-700/60' style={{ animationDelay: '0.1s' }}>
                     <p className='text-sm text-gray-400 text-center'>Total Earnings</p>
                     <p className='text-4xl font-extrabold text-center mt-1 bg-linear-to-r from-green-400 to-blue-500 bg-clip-text text-transparent'>
-                        ${totalEarnings.toFixed(2)}
+                        {isLoading ? '—' : `$${totalEarnings.toFixed(2)}`}
                     </p>
                     <div className='mt-4 grid grid-cols-2 gap-3'>
                         <div className='rounded-lg bg-gray-900/60 border border-gray-700/60 px-4 py-3 text-center'>
                             <p className='text-xs text-gray-400'>Payments</p>
-                            <p className='text-lg font-bold text-white'>{payments ? payments.length : 0}</p>
+                            <p className='text-lg font-bold text-white'>{isLoading ? '—' : payments.length}</p>
                         </div>
                         <div className='rounded-lg bg-gray-900/60 border border-gray-700/60 px-4 py-3 text-center'>
                             <p className='text-xs text-gray-400'>Highest donation</p>
-                            <p className='text-lg font-bold text-green-300'>${highestDonation.toFixed(2)}</p>
+                            <p className='text-lg font-bold text-green-300'>{isLoading ? '—' : `$${highestDonation.toFixed(2)}`}</p>
                         </div>
                     </div>
                 </div>
 
                 {/* Top 5 Supporters */}
-                {payments && payments.length > 0 && (
+                {!isLoading && payments.length > 0 && (
                     <div className='fm-card bg-gray-800 p-5 rounded-xl border border-gray-700/60' style={{ animationDelay: '0.2s' }}>
                         <div className='flex items-center gap-2'>
                             <span className='fm-crown text-2xl' aria-hidden="true">🏆</span>
@@ -112,8 +150,10 @@ const EarningPage = ({ username }) => {
                 {/* All payments */}
                 <div className='fm-card bg-gray-800 p-5 rounded-xl border border-gray-700/60' style={{ animationDelay: '0.3s' }}>
                     <h2 className='text-xl font-bold text-white'>All Payments</h2>
-                    {payments === null ? (
+                    {isLoading ? (
                         <p className='mt-3 text-gray-300 animate-pulse'>Loading earnings...</p>
+                    ) : hasError ? (
+                        <p className='mt-3 text-red-400'>Something went wrong while loading your earnings. Please try again.</p>
                     ) : payments.length === 0 ? (
                         <p className='mt-3 text-gray-300'>No payments received.</p>
                     ) : (
